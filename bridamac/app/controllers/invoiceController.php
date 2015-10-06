@@ -766,6 +766,8 @@ class InvoiceController extends \BaseController {
 			'products' => $products,
 			'contacts' => $contacts,
 		);
+		return Response::json($data);
+		return var_dump($data);
 		return View::make('factura.show',$data);
 	}
 
