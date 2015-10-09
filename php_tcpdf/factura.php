@@ -1,62 +1,46 @@
 <?php
-//============================================================+
-// File name   : example_009.php
-// Begin       : 2008-03-04
-// Last Update : 2013-05-14
-//
-// Description : Example 009 for TCPDF class
-//               Test Image
-//
-// Author: Nicola Asuni
-//
-// (c) Copyright:
-//               Nicola Asuni
-//               Tecnick.com LTD
-//               www.tecnick.com
-//               info@tecnick.com
-//============================================================+
-
-/**
- * Creates an example PDF TEST document using TCPDF
- * @package com.tecnick.tcpdf
- * @abstract TCPDF - Example: Test Image
- * @author Nicola Asuni
- * @since 2008-03-04
- */
-
 // Include the main TCPDF library (search for installation path).
 require_once('tcpdf/examples/tcpdf_include.php');
+require_once('tcpdf/examples/barcodes/tcpdf_barcodes_2d_include.php');
+
+// Extend the TCPDF class to create custom Header and Footer
+class MYPDF extends TCPDF {
+
+	//Page header
+	public function Header() {
+		// Logo
+		$image_file = K_PATH_IMAGES.'asd.png';
+		$this->Image($image_file, 5, -2, 35, '', 'PNG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+	}
+
+	// Page footer
+	public function Footer() {
+		// Position at 15 mm from bottom
+		$this->SetY(-15);
+		// Set font
+		$this->SetFont('helvetica', 'I', 8);
+		// Page number
+		$this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+	}
+}
 
 // create new PDF document
-$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+$pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
 // set document information
 $pdf->SetCreator(PDF_CREATOR);
-$pdf->SetAuthor('Nicola Asuni');
-$pdf->SetTitle('TCPDF Example 009');
-$pdf->SetSubject('TCPDF Tutorial');
+$pdf->SetAuthor('Roy');
+$pdf->SetTitle('Factura');
+$pdf->SetSubject('Primera Factura');
 $pdf->SetKeywords('TCPDF, PDF, example, test, guide');
 
-// set default header data
-$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 009', PDF_HEADER_STRING);
-
-// set header and footer fonts
-$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-$pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-
-// set default monospaced font
-$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-
 // set margins
-$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+$pdf->SetMargins(5, PDF_MARGIN_TOP, 9);
 $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 
 // set auto page breaks
 $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-
-// set image scale factor
-$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 
 // set some language-dependent strings (optional)
 if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
@@ -64,82 +48,183 @@ if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
 	$pdf->setLanguageArray($l);
 }
 
-// -------------------------------------------------------------------
+// ---------------------------------------------------------
 
+// set font
+$pdf->SetFont('times', 'B' , 11);
+$nit = 7024739019;
+$nfac = 001;
+$nauto = 1234567890123;
 // add a page
 $pdf->AddPage();
+//cuadro roy
+$html = '
+<p>
+NIT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: '.$nit.' <br>
+Nº FACTURA &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	: '.$nfac.' <br>
+Nº AUTORIZACION &nbsp;: '.$nauto.'  <br>
+</p>					';
 
-// set JPEG quality
-$pdf->setJPEGQuality(75);
+$pdf->writeHTMLCell($w=0, $h=0, $x='133', $y='8', $html, $border=0, $ln=1, $fill=0, $reseth=true, $align='left', $autopadding=true);
+// Rounded rectangle
+$pdf->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
+$pdf->RoundedRect(130, 5, 75, 22, 2, '1111', null);
 
-// Image method signature:
-// Image($file, $x='', $y='', $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false)
+///title roy
+$pdf->SetFont('times', 'B', 18);
+$html2='<h1>FACTURA</h1>';
+$pdf->writeHTMLCell($w=0, $h=0, $x='75', $y='18', $html2, $border=0, $ln=1, $fill=0, $reseth=true, $align='left', $autopadding=true);
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//nombre de la empresa roy
 
-// Example of Image from data stream ('PHP rules')
-$imgdata = base64_decode('iVBORw0KGgoAAAANSUhEUgAAABwAAAASCAMAAAB/2U7WAAAABlBMVEUAAAD///+l2Z/dAAAASUlEQVR4XqWQUQoAIAxC2/0vXZDrEX4IJTRkb7lobNUStXsB0jIXIAMSsQnWlsV+wULF4Avk9fLq2r8a5HSE35Q3eO2XP1A1wQkZSgETvDtKdQAAAABJRU5ErkJggg==');
+$pdf->SetFont('times', 'B', 12);
+$datos = '
+<p style="line-height: 150% ">
+Roy Corp
+</p>';
+$pdf->writeHTMLCell($w=0, $h=0, $x='10', $y='35', $datos, $border=0, $ln=1, $fill=0, $reseth=true, $align='left', $autopadding=true);
+//original scf-1 roy
 
-// The '@' character is used to indicate that follows an image data stream and not an image file name
-$pdf->Image('@'.$imgdata);
+$pdf->SetFont('times', 'B', 12);
+$datos2 = '
+<p style="line-height: 150% ">
+ORIGINAL  SFC-1
+</p>';
+$pdf->writeHTMLCell($w=0, $h=0, $x='145', $y='28', $datos2, $border=0, $ln=1, $fill=0, $reseth=true, $align='left', $autopadding=true);
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//datos de la empresa roy
+$sucursal = "Casa Matriz";
+$direccion = "Calle de las Rosas Nº 100";
+$ciudad = "La Paz - Bolivia";
 
-// Image example with resizing
-$pdf->Image('images/asd.png', 15, 140, 75, 113, 'JPG', 'http://www.tcpdf.org', '', true, 150, '', false, false, 1, false, false, false);
+$pdf->SetFont('times', '', 10);
+$datos = '
+<p>
+'.$sucursal.'<br>
+Dirección<br>
+'.$direccion.'<br>
+'.$ciudad.'<br>
+</p>					';
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+$pdf->writeHTMLCell($w=0, $h=0, $x='10', $y='42', $datos, $border=0, $ln=1, $fill=0, $reseth=true, $align='left', $autopadding=true);
+//actividad económica roy
+$actividad = "Venta de Productos";
+$pdf->SetFont('times', 'B', 11);
+$act = '
+<p>
+Actividad Económica : '.$actividad.'<br>
+</p>';
 
-// test fitbox with all alignment combinations
+$pdf->writeHTMLCell($w=0, $h=0, $x='130', $y='35', $act, $border=0, $ln=1, $fill=0, $reseth=true, $align='left', $autopadding=true);
+//TABLA 1 roy
+$pdf->SetFont('times', '', 11);
+$fecha = "09 de Octubre de 2015";
+$señor = "Cascada";
+$nit = 20245475018;
+$tbl = <<<EOD
+<table cellspacing="0" cellpadding="5" border="1">
+    <tr>
+        <td><b>Fecha :</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$fecha <br/><b>Señor(es):</b>&nbsp;&nbsp; $señor  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>NIT/CI : $nit</b></td>
+    </tr>
+</table>
+EOD;
 
-$horizontal_alignments = array('L', 'C', 'R');
-$vertical_alignments = array('T', 'M', 'B');
+$pdf->writeHTMLCell($w=0, $h=0, $x='10', $y='65', $tbl, $border=0, $ln=1, $fill=0, $reseth=true, $align='left', $autopadding=true);
 
-$x = 15;
-$y = 35;
-$w = 30;
-$h = 30;
+/////tabla 2 roy
+
 // test all combinations of alignments
-for ($i = 0; $i < 3; ++$i) {
-	$fitbox = $horizontal_alignments[$i].' ';
-	$x = 15;
-	for ($j = 0; $j < 3; ++$j) {
-		$fitbox[1] = $vertical_alignments[$j];
-		$pdf->Rect($x, $y, $w, $h, 'F', array(), array(128,255,128));
-		$pdf->Image('images/asd.png', $x, $y, $w, $h, 'JPG', '', '', false, 300, '', false, false, 0, $fitbox, false, false);
-		$x += 32; // new column
-	}
-	$y += 32; // new row
+$text = '';
+$text .= '
+<thead>
+ <tr>
+  <td width="70" align="center"><b>CANTIDAD</b></td>
+  <td width="240" align="center"><b>CONCEPTO</b></td>
+  <td width="130" align="center"><b>PRECIO UNITARIO</b></td>
+  <td width="112" align="center"> <b>SUBTOTAL</b></td>
+ </tr>
+</thead>
+';
+
+for ($i = 0; $i < 27; ++$i) {
+		$text .='
+		<tr>
+		 <td width="70" align="center">'.$i.'</td>
+		 <td width="240" align="center">100</td>
+		 <td width="130" align="center">252.00</td>
+		 <td width="112" align="center"> 252.00</td>
+		 </tr>
+		';
 }
 
-$x = 115;
-$y = 35;
-$w = 25;
-$h = 50;
-for ($i = 0; $i < 3; ++$i) {
-	$fitbox = $horizontal_alignments[$i].' ';
-	$x = 115;
-	for ($j = 0; $j < 3; ++$j) {
-		$fitbox[1] = $vertical_alignments[$j];
-		$pdf->Rect($x, $y, $w, $h, 'F', array(), array(128,255,255));
-		$pdf->Image('images/asd.png', $x, $y, $w, $h, 'JPG', '', '', false, 300, '', false, false, 0, $fitbox, false, false);
-		$x += 27; // new column
-	}
-	$y += 52; // new row
+		$text .='
+		<tr>
+		 <td colspan="3" align="rigth"><b>Total Bs.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></td>
+		 <td width="112" align="center"><b>252.00</b></td>
+		</tr>
+		';
+$text2 = '<table border="1" cellpadding="3" cellspacing="0">
+			'.$text.'
+		</table>
+		';
+		
+		//$pdf->Image('images/image_demo.jpg', $x, $y, $w, $h, 'JPG', '', '', false, 300, '', false, false, 0, $fitbox, false, false);
+$pdf->writeHTMLCell($w=0, $h=0, 10, 84, $text2, $border=0, $ln=1, $fill=0, $reseth=true, $align='left', $autopadding=true);
+//total en literal
+
+$cod = $y+46+$i*6.85;
+$total = '<br>
+<b>Son:</b> DOS CIENTOS CINCUENTA Y DOS 00/100.....BOLIVIANOS.<br>
+';
+$pdf->writeHTMLCell($w=0, $h=0, $x=10, '', $total, $border=0, $ln=1, $fill=0, $reseth=true, $align='left', $autopadding=true);
+
+
+//final roy
+$final = '
+<table border="0">
+<tr>
+	<td width="460" align="left"><b>CODIGO DE CONTROL :&nbsp;&nbsp;&nbsp;&nbsp; BF-86-6B-98 </b></td>
+	<td width="92" rowspan="6">
+</td>
+</tr>
+<tr>
+	<td width="460" align="left"><b>Fecha Limite de Emisión : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;28/12/2015 </b></td>
+</tr>
+<tr>
+<td>
+</td>
+</tr>
+<tr>
+	<td width="460" align="center"><b>"ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAIS, EL USO ILICITO DE ESTA SERA SANCIONADO DE ACUERDO A LEY"</b></td>
+</tr>
+<tr><td></td></tr>
+<tr>
+	<td width="460" align="center" style="font-size:10px">"Ley Nº 453: Está prohibido importar, distribuir o comercializar productos expirados o prontos a expirar"</td>
+</tr>
+</table>
+';
+if ( $i == 17 || $i == 18 || $i == 19 || $i == 20 ){
+	$pdf->writeHTMLCell($w=0, $h=0, $x=10, $pdf->GetY()+25, $final, $border=0, $ln=1, $fill=0, $reseth=true, $align='left', $autopadding=true);
+}else{
+	$pdf->writeHTMLCell($w=0, $h=0, $x=10, '', $final, $border=0, $ln=1, $fill=0, $reseth=true, $align='left', $autopadding=true);
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//$left_column = $pdf->write2DBarcode('7024736019|3|2104002021751|2015-10-02|30.50|30.50|15451254|0|0|0|0', 'QRCODE,L', '175', '', 30, 30, '', 'N');
+//$pdf->writeHTMLCell(80, '', '', '', $left_column, 0, 0, 0, true, 'J', true);
 
-// Stretching, position and alignment example
 
-$pdf->SetXY(110, 200);
-$pdf->Image('images/asd.png', '', '', 40, 40, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
-$pdf->Image('images/asd.png', '', '', 40, 40, '', '', '', false, 300, '', false, false, 1, false, false, false);
 
-// -------------------------------------------------------------------
+
+
+
+//qr roy
+$pdf->write2DBarcode('7024736019|3|2104002021751|2015-10-02|30.50|30.50|15451254|0|0|0|0', 'QRCODE,L', '175', 
+$pdf->GetY()-25, 25, 25, '', 'N');
+
+// ---------------------------------------------------------
 
 //Close and output PDF document
-$pdf->Output('example_009.pdf', 'I');
+$pdf->Output('example_003.pdf', 'I');
 
 //============================================================+
 // END OF FILE
